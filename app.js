@@ -4,7 +4,20 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var helmet = require('helmet');
+var session = require('express-session');
+var passport = require('passport');
+require("dotenv").config();
+var GithubStrategy = require('passport-github2').Strategy;
+const env = process.env;
 
+var GITHUB_CLIENT_ID = env.GITHUB_CLIENT_ID;
+var GITHUB_CLIENT_SECRET = env.GITHUB_CLIENT_SECRET;
+
+passport.serializeUser(function(user, done){
+  done(null, user);
+})
+
+// todo
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
