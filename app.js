@@ -15,9 +15,23 @@ var GITHUB_CLIENT_SECRET = env.GITHUB_CLIENT_SECRET;
 
 passport.serializeUser(function(user, done){
   done(null, user);
-})
+});
 
-// todo
+passport.deserializeUser(function(obj,done){
+  done(null, obj);
+});
+
+passport.use(new GithubStrategy({
+  clientID: GITHUB_CLIENT_ID,
+  clientSecret: GITHUB_CLIENT_SECRET,
+  callbackURL: 'http://localhost:8000/auth/github/callback'
+},
+  function(accessToken, refreshToken, profile, done){
+    process.nextTick(function(){
+      done(null, profile);
+    });
+  }
+));
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
