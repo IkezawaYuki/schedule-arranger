@@ -6,6 +6,26 @@ var logger = require('morgan');
 var helmet = require('helmet');
 var session = require('express-session');
 var passport = require('passport');
+
+var User = require('./models/user');
+var Candidate = require('./models/candidate');
+var Comment = require('./models/comment');
+var Schedule = require('./models/schedule');
+var Availability = require('./models/availability');
+
+User.sync().then(() => {
+  Schedule.belongsTo(User, {foreignKey: 'createdBy'});
+  Schedule.sync();
+  Comment.belongsTo(User, {foreignKey: 'userId'});
+  Comment.sync();
+  Availability.belongsTo(User, {foreignKey: 'userId'});
+  Candidate.sync().then(() => {
+    Availability.belongsTo(Candidate, {foreignKey: 'candidateId'});
+    Availability.sync();
+  });
+});
+
+
 require("dotenv").config();
 const env = process.env;
 
@@ -28,7 +48,12 @@ passport.use(new GithubStrategy({
 },
   function(accessToken, refreshToken, profile, done){
     process.nextTick(function(){
-      return done(null, profile);
+      User.upsert({
+        userId: profile.id,
+        username: profile.username
+      }).then(() => {
+        done(null, profile);
+      })
     });
   }
 ));
