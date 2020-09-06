@@ -6,9 +6,6 @@ const authenticationEnsurer = require('./authentication-ensurer');
 const uuid = require('uuid');
 const Schedule = require('../models/schedule');
 const Candidate = require('../models/candidate');
-const uuid = require("uuid");
-const Schedule = require("../models/schedule");
-const Candidate = require("../models/candidate");
 
 
 router.get('/new', authenticationEnsurer, (req, res, next) => {
@@ -17,13 +14,13 @@ router.get('/new', authenticationEnsurer, (req, res, next) => {
 
 router.post('/', authenticationEnsurer, (req, res, next) => {
   const scheduleId = uuid.v4();
-  const updateAt = new Date();
+  const updatedAt = new Date();
   Schedule.create({
     scheduleId: scheduleId,
     scheduleName: req.body.scheduleName.slice(0, 255) || '（名称未設定）',
     memo: req.body.memo,
     createdBy: req.user.id,
-    updateAt: updateAt
+    updatedAt: updatedAt
   }).then((schedule) => {
     const candidateNames = req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
     const candidates = candidateNames.map((c) => {
@@ -33,7 +30,7 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
       };
     });
     Candidate.bulkCreate(candidates).then(() => {
-      res.redirect('/schedules/', schedule.scheduleId);
+      res.redirect('/schedules/'+schedule.scheduleId);
     });
   });
 });

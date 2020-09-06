@@ -5,6 +5,12 @@ block content
   p Welcome to #{title}
   div
     if user
-      a(href="/logout") #{user.username}をログアウト
+      div
+        a(href="/logout") #{user.username}をログアウト
+      div
+        a(href="/schedules/new") 予定を作る
+      - var hasSchedule = schedules.length > 0
+      if hasSchedule
+        
     else
       a(href="/login") ログイン
