@@ -6,6 +6,7 @@ const authenticationEnsurer = require('./authentication-ensurer');
 const uuid = require('uuid');
 const Schedule = require('../models/schedule');
 const Candidate = require('../models/candidate');
+const User = require('../models/user');
 
 
 router.get('/new', authenticationEnsurer, (req, res, next) => {
@@ -34,5 +35,22 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
     });
   });
 });
+
+router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
+  Schedule.findOne({
+    include: [
+      {
+        model: User,
+        attributes: ['userId', 'username']
+      }
+    ],
+    where: {
+      scheduleId: req.params.scheduleId
+    },
+    order: [['updatedAd', 'DESC']]
+  }).then((schedule) => {
+    // todo
+  })
+})
 
 module.exports = router;
