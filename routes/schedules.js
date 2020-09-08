@@ -47,10 +47,26 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     where: {
       scheduleId: req.params.scheduleId
     },
-    order: [['updatedAd', 'DESC']]
+    order: [['updatedAt', 'DESC']]
   }).then((schedule) => {
-    // todo
-  })
-})
+    if (schedule) {
+      Candidate.findAll({
+        where: { scheduleId: schedule.scheduleId},
+        order: [['candidateId', 'ASC']]
+      }).then((candidates) => {
+        res.render('schedule', {
+          user: req.user,
+          schedule: schedule,
+          candidates: candidates,
+          users: [req.user]
+        });
+      });
+    } else {
+      const err = new Error('指定された予定は見つかりません');
+      err.status = 404;
+      next(err);
+    }
+  });
+});
 
 module.exports = router;

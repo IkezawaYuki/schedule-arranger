@@ -3,6 +3,7 @@
 const request = require('supertest');
 const app = require("../app")
 const passportStab = require("passport-stub");
+const User = require('../models/user');
 
 
 describe('/login', () => {
@@ -37,5 +38,11 @@ describe('/login', () => {
     .get('/logout')
     .expect('Location', '/')
     .expect(302);
+  });
+
+  test('予定が作成でき、表示できる', (done) => {
+    User.upsert({ userId: 0, username: 'test'}).then(() => {
+      // todo
+    })
   })
 });
