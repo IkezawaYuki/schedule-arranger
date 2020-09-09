@@ -42,7 +42,13 @@ describe('/login', () => {
 
   test('予定が作成でき、表示できる', (done) => {
     User.upsert({ userId: 0, username: 'test'}).then(() => {
-      // todo
+      request(app)
+      .post('/schedules')
+      .send(
+        {
+          
+        }
+      )
     })
   })
 });
