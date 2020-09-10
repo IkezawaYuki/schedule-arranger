@@ -4,6 +4,7 @@ const request = require('supertest');
 const app = require("../app")
 const passportStab = require("passport-stub");
 const User = require('../models/user');
+const Candidate = require('../models/candidate');
 
 
 describe('/login', () => {
@@ -46,9 +47,38 @@ describe('/login', () => {
       .post('/schedules')
       .send(
         {
-          
-        }
-      )
-    })
-  })
+          scheduleName: '予定１',
+          memo: 'テストメモ1\r\nテストメモ2',
+          candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3'
+        })
+        .expect('Location', /schedules/)
+        .expect(302)
+        .end((err, res) => {
+          const createdSchedulePath = res.headers.location;
+          request(app)
+          .get(createdSchedulePath)
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+
+            const scheduleId = createdSchedulePath.split('/schedules/')[1];
+            Candidate.findAll({
+              where: { scheduleId: scheduleId}
+            }).then(candidates => {
+              const promises = candidates.map(c => {
+                return c.destroy();
+              });
+              Promise.all(promises).then(() => {
+                Schedule.findByPk(scheduleId).then(s => {
+                  s.destroy().then(() => {
+                    if (err) return done(err);
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+    });
+  });
 });
