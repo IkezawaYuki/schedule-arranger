@@ -7,6 +7,7 @@ const uuid = require('uuid');
 const Schedule = require('../models/schedule');
 const Candidate = require('../models/candidate');
 const User = require('../models/user');
+const Availability = require('../models/availability');
 
 
 router.get('/new', authenticationEnsurer, (req, res, next) => {
@@ -54,11 +55,32 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         where: { scheduleId: schedule.scheduleId},
         order: [['candidateId', 'ASC']]
       }).then((candidates) => {
-        res.render('schedule', {
-          user: req.user,
-          schedule: schedule,
-          candidates: candidates,
-          users: [req.user]
+        Availability.findAll({
+          include: [
+            {
+              model: User,
+              attributes: ['userId', 'username']
+            }
+          ],
+          where: {scheduleId: schedule.scheduleId},
+          order: [[User, 'username', 'ASC'], ['candidateId', 'ASC']]
+        }).then((availabilities) => {
+          const availabilityMapMap = new Map();
+          availabilities.forEach((a) => {
+            const map = availabilityMapMap.get(a.user.userId) || new Map();
+            map.set(a.candidateId, a.availability);
+            availabilityMapMap.set(a.user.userId, map);
+          });
+
+          console.log(availabilityMapMap);
+
+          res.render('schedule', {
+            user: req.user,
+            schedule: schedule,
+            candidates: candidates,
+            users: [req.user],
+            availabilityMapMap: availabilityMapMap 
+          });
         });
       });
     } else {

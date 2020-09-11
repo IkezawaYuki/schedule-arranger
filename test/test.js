@@ -57,6 +57,7 @@ describe('/login', () => {
           const createdSchedulePath = res.headers.location;
           request(app)
           .get(createdSchedulePath)
+          .expect(/走る/)
           .expect(200)
           .end((err, res) => {
             if (err) return done(err);
