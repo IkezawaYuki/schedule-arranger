@@ -71,14 +71,35 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
             map.set(a.candidateId, a.availability);
             availabilityMapMap.set(a.user.userId, map);
           });
-
-          console.log(availabilityMapMap);
+          const userMap = new Map();
+          userMap.set(req.user.id, {
+            isSelf: true,
+            userId: parseInt(req.user.id),
+            user: req.user.username,
+          });
+          availabilities.forEach((a) => {
+            userMap.set(a.user.userId, {
+              isSelf: parseInt(req.user.id) === a.user.userId,
+              user: a.user.username
+            });
+          });
+          const users = Array.from(userMap).map((keyValue) => keyValue[1]);
+          users.forEach((u) => {
+            candidates.forEach((c) => {
+              const map = availabilityMapMap.get(u.userId) || new Map();
+              const a = map.get(c.candidateId) || 0;
+              map.set(c.candidateId, a);
+              availabilityMapMap.set(u.userId, map);
+            });
+          });
+          
+          console.log(availabilityMapMap)
 
           res.render('schedule', {
             user: req.user,
             schedule: schedule,
             candidates: candidates,
-            users: [req.user],
+            users: users,
             availabilityMapMap: availabilityMapMap 
           });
         });
