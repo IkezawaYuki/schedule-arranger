@@ -3,7 +3,7 @@
 const loader = require('./sequelize-loader');
 const Sequelize = loader.Sequelize;
 
-const Shedules = loader.database.define(
+const Shedule = loader.database.define(
   'schedules',
   {
     scheduleId: {
@@ -39,4 +39,4 @@ const Shedules = loader.database.define(
   }
 );
 
-module.exports = Shedules;
+module.exports = Shedule;
