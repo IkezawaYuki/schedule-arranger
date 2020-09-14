@@ -7,6 +7,7 @@ const User = require('../models/user');
 const Candidate = require('../models/candidate');
 const Schedule = require('../models/schedule');
 const Availability = require('../models/availability');
+const assert = require('assert');
 
 
 describe('/login', () => {
