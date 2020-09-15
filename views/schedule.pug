@@ -18,6 +18,11 @@ block content
           - var availabilityLavel = ['欠', '?', '出']
           td
             if user.isSelf
-              button #{availabilityLavel[availability]}
+              button(
+                data-schedule-id=schedule.scheduleId
+                data-user-id=user.userId
+                data-candidate-id=candidate.candidateId
+                data-availability=availability
+              ).availability-toggle-button #{availabilityLavel[availability]}
             else
               p #{availabilityLavel[availability]}
