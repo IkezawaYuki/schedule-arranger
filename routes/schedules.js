@@ -8,6 +8,7 @@ const Schedule = require('../models/schedule');
 const Candidate = require('../models/candidate');
 const User = require('../models/user');
 const Availability = require('../models/availability');
+const Comment = require('../models/comment');
 
 
 router.get('/new', authenticationEnsurer, (req, res, next) => {
@@ -95,12 +96,21 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           
           console.log(availabilityMapMap)
 
-          res.render('schedule', {
-            user: req.user,
-            schedule: schedule,
-            candidates: candidates,
-            users: users,
-            availabilityMapMap: availabilityMapMap 
+          Comment.findAll({
+            where:{ scheduleId: schedule.scheduleId}
+          }).then((comments) => {
+            const commentMap = new Map();
+            comments.forEach((comment) => {
+              commentMap.set(comment.userId, comment.comment);
+            });
+            res.render('schedule', {
+              user: req.user,
+              schedule: schedule,
+              candidates: candidates,
+              users: users,
+              availabilityMapMap: availabilityMapMap,
+              commentMap: commentMap
+            });
           });
         });
       });
