@@ -106,6 +106,24 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
   });
 });
 
+describe('/schedules/:scheduleId/user/:userId/comments', () => {
+  beforeAll(() => {
+    passportStab.install(app);
+    passportStab.login({ id: 0, username: 'testuser' });
+  });
+
+  afterAll(() => {
+    passportStab.logout();
+    passportStab.uninstall(app);
+  });
+
+  test('コメントが更新している', (done) => {
+    User.upsert({userId: 0, username: "testuser"}).then(() => {
+      // todo
+    });
+  });
+});
+
 function deleteScheduleAggregate(scheduleId, done, err){
   Availability.findAll({
     where: {scheduleId: scheduleId}
