@@ -119,7 +119,14 @@ describe('/schedules/:scheduleId/user/:userId/comments', () => {
 
   test('コメントが更新している', (done) => {
     User.upsert({userId: 0, username: "testuser"}).then(() => {
-      // todo
+      request(app)
+          .post('/schedules')
+          .send({scheduleName: 'テストコメント更新予定１', memo: 'テストコメント更新メモ1', candidates: 'テストコメント更新候補1'})
+          .end((err, res) => {
+            const createdSchedulePath = res.headers.location;
+            const scheduleId = createdSchedulePath.split('/schedules/')[1];
+
+          })
     });
   });
 });
