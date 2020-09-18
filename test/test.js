@@ -7,6 +7,7 @@ const User = require('../models/user');
 const Candidate = require('../models/candidate');
 const Schedule = require('../models/schedule');
 const Availability = require('../models/availability');
+const Comment = require('../models/comment');
 const assert = require('assert');
 
 
@@ -85,7 +86,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
     User.upsert({userId: 0, username: 'testuser'}).then(() => {
       request(app)
       .post('/schedules')
-      .send({scheduleName: 'テスト出欠予定更新１', memo: 'テスト出欠更新めも１', candidates: 'テスト出欠更新候補１'})
+      .send({scheduleName: 'テスト出欠予定更新１', memo: 'テスト出欠更新メモ１', candidates: 'テスト出欠更新候補１'})
       .end((err, res) => {
         const createdSchedulePath = res.headers.location;
         const scheduleId = createdSchedulePath.split('/schedules/')[1];
@@ -126,7 +127,21 @@ describe('/schedules/:scheduleId/user/:userId/comments', () => {
             const createdSchedulePath = res.headers.location;
             const scheduleId = createdSchedulePath.split('/schedules/')[1];
 
-          })
+            const userId = 0
+            request(app)
+                .post(`/schedules/${scheduleId}/users/${userId}/comments`)
+                .send({comment: 'testcomment'})
+                .expect('{"status": "OK", "comment": "testcomment"}')
+                .end((err, res) => {
+                  Comment.findAll({
+                    where: {scheduleId: scheduleId}
+                  }).then(comments => {
+                    assert.equal(comments.length, 1);
+                    assert.equal(comments[0].comment, 'testcomment');
+                    deleteScheduleAggregate(scheduleId, done, err)
+                  });
+                });
+          });
     });
   });
 });
