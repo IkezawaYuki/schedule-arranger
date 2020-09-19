@@ -4,7 +4,7 @@ const loader = require('./sequelize-loader');
 const Sequelize = loader.Sequelize;
 
 const Candidate = loader.database.define(
-  'cancandidates',
+  'candidates',
   {
     candidateId: {
       type: Sequelize.INTEGER,

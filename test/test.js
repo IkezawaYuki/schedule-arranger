@@ -107,7 +107,7 @@ describe('/schedules/:scheduleId/users/:userId/candidates/:candidateId', () => {
   });
 });
 
-describe('/schedules/:scheduleId/user/:userId/comments', () => {
+describe('/schedules/:scheduleId/users/:userId/comments', () => {
   beforeAll(() => {
     passportStab.install(app);
     passportStab.login({ id: 0, username: 'testuser' });
@@ -122,7 +122,10 @@ describe('/schedules/:scheduleId/user/:userId/comments', () => {
     User.upsert({userId: 0, username: "testuser"}).then(() => {
       request(app)
           .post('/schedules')
-          .send({scheduleName: 'テストコメント更新予定１', memo: 'テストコメント更新メモ1', candidates: 'テストコメント更新候補1'})
+          .send({
+            scheduleName: 'テストコメント更新予定１',
+            memo: 'テストコメント更新メモ1',
+            candidates: 'テストコメント更新候補1'})
           .end((err, res) => {
             const createdSchedulePath = res.headers.location;
             const scheduleId = createdSchedulePath.split('/schedules/')[1];
@@ -136,8 +139,8 @@ describe('/schedules/:scheduleId/user/:userId/comments', () => {
                   Comment.findAll({
                     where: {scheduleId: scheduleId}
                   }).then(comments => {
-                    assert.equal(comments.length, 1);
-                    assert.equal(comments[0].comment, 'testcomment');
+                    assert.strictEqual(comments.length, 1);
+                    assert.strictEqual(comments[0].comment, 'testcomment');
                     deleteScheduleAggregate(scheduleId, done, err)
                   });
                 });
