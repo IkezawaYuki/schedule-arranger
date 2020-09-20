@@ -12,6 +12,9 @@ var Schedule = require('./models/schedule');
 var Availability = require('./models/availability');
 var Candidate = require('./models/candidate');
 var Comment = require('./models/comment');
+
+require('dotenv').config()
+
 User.sync().then(() => {
   Schedule.belongsTo(User, { foreignKey: 'createdBy' });
   Schedule.sync();
@@ -26,8 +29,9 @@ User.sync().then(() => {
 
 
 var GitHubStrategy = require('passport-github2').Strategy;
-var GITHUB_CLIENT_ID = '2f831cb3d4aac02393aa';
-var GITHUB_CLIENT_SECRET = '9fbc340ac0175123695d2dedfbdf5a78df3b8067';
+
+var GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+var GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -94,7 +98,15 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
-    res.redirect('/');
+    var loginFrom = req.cookies.loginFrom;
+    if (loginFrom &&
+      !loginFrom.includes("http://") &&
+      !loginFrom.includes("https://")){
+      res.clearCookie('loginFrom')
+      res.redirect(loginFrom);
+    } else{
+      res.redirect("/")
+    }
   });
 
 // catch 404 and forward to error handler
